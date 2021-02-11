@@ -22,7 +22,8 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-import urllib.parse
+from urllib.parse import urlparse,urlencode
+
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -33,6 +34,26 @@ class HTTPResponse(object):
         self.body = body
 
 class HTTPClient(object):
+    def get_host_port_path(self,url):
+        host = urlparse(url).hostname
+        port = urlparse(url).port
+        path = urlparse(url).path
+        if port == None:
+            port = 80
+            return host,port,path
+            
+        elif path == None or '':
+            path = '/'
+            return host,port,path
+        elif host == None:
+            host = '127.0.0.1'
+            return host,port,path
+
+        else:
+            return host,port,path
+
+
+        
     #def get_host_port(self,url):
 
     def connect(self, host, port):
@@ -41,13 +62,41 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        return None
+        try:
+            get_data = data.split(' ')
+            code = int(get_data[1])
+            return code
+        except:
+            raise Exception('no data found')
+        
+
+            
+            
+            
+
+        
+
 
     def get_headers(self,data):
-        return None
+        #seperate data in to lines:
+        header_data = data.split('\r\n')
+        header_info = []
+        start = 1
+        while not header_data[start] == '' and start <= (len(header_data)+1):
+            header_info.append(header_data[start])
+            start += 1
+
+        return header_info
 
     def get_body(self, data):
-        return None
+        if data:
+            try:
+                body_data = data.split('\r\n\r\n')[1]
+
+            
+            except:
+                raise Exception('No content found')
+        return body_data
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
@@ -67,14 +116,55 @@ class HTTPClient(object):
                 done = not part
         return buffer.decode('utf-8')
 
+
+        #https://github.com/Kay7777/CMPUT404-assignment-web-client/blob/master/httpclient.py
+        #from kaysong:qsong
+        
+
+    
+
     def GET(self, url, args=None):
-        code = 500
-        body = ""
-        return HTTPResponse(code, body)
+        
+        host,port,path = self.get_host_port_path(url)
+        self.connect(host,port)
+        self.sendall("GET {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Connection: close\r\n\r\n")
+        response = self.recvall(self.socket)
+        self.socket.close()
+        code = self.get_code(response)
+        print(code)
+        body = self.get_body(response)
+
+        return HTTPResponse(code,body)
+
+
+        
+
+        
+
+        
+
+
 
     def POST(self, url, args=None):
         code = 500
         body = ""
+        host,port,path = self.get_host_port_path(url)
+        if args:
+            it = urlencode(args)
+            self.connect(host,port)
+            self.sendall("POST {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: {}\r\n".format(len(it))+"Connection: close\r\n\r\n{}".format(it))
+            response = self.recvall(self.socket)
+            self.socket.close()
+
+        else:
+            self.connect(host,port)
+            self.sendall("POST {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: 0\r\n"+"Connection: close\r\n\r\n")
+            response = self.recvall(self.socket)
+            self.socket.close()
+        
+        code = self.get_code(response)
+        body = self.get_body(response)
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
