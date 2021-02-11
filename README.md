@@ -22,10 +22,6 @@ Collaboration: team members
 * xutong2
 * pyu
 
-yanlin2
-qsong
-xutong2
-pyu
 
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle, 
 https://github.com/tywtyw2002, and https://github.com/treedust
