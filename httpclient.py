@@ -127,7 +127,11 @@ class HTTPClient(object):
         
         host,port,path = self.get_host_port_path(url)
         self.connect(host,port)
-        self.sendall("GET {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Connection: close\r\n\r\n")
+        self.sendall("GET /" + path+ " HTTP/1.1\r\n")
+        self.sendall("Host: "+ host + "\r\n")
+        self.sendall("User-Agent: Python-urllib\r\n")
+        self.sendall("Accept: */*\r\n")
+        self.sendall("Connection: close\r\n\r\n")
         response = self.recvall(self.socket)
         self.socket.close()
         code = self.get_code(response)
@@ -152,13 +156,13 @@ class HTTPClient(object):
         if args:
             it = urlencode(args)
             self.connect(host,port)
-            self.sendall("POST {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: {}\r\n".format(len(it))+"Connection: close\r\n\r\n{}".format(it))
+            self.sendall("POST /{} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: {}\r\n".format(len(it))+"Connection: close\r\n\r\n{}".format(it))
             response = self.recvall(self.socket)
             self.socket.close()
 
         else:
             self.connect(host,port)
-            self.sendall("POST {} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: 0\r\n"+"Connection: close\r\n\r\n")
+            self.sendall("POST /{} HTTP/1.1\r\n".format(path)+"Host: {}\r\n".format(host)+"User-Agent: Python-urllib\r\n"+"Accept: */*\r\n"+"Content-Type: application/x-www-form-urlencoded\r\n"+"Content-Length: 0\r\n"+"Connection: close\r\n\r\n")
             response = self.recvall(self.socket)
             self.socket.close()
         
