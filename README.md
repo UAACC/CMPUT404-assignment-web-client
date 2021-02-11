@@ -7,10 +7,20 @@ See requirements.org (plain-text) for a description of the project.
 
 Make a simple web-client like curl or wget
 
-dongheng
+
 
 Contributors / Licensing
 ========================
+
+* Dongheng Li
+
+
+Collaboration: team members
+
+* yanlin2
+* qsong
+* xutong2
+* pyu
 
 yanlin2
 qsong
