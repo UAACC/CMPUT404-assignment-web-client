@@ -127,7 +127,7 @@ class HTTPClient(object):
         
         host,port,path = self.get_host_port_path(url)
         self.connect(host,port)
-        self.sendall("GET /" + path+ " HTTP/1.1\r\n")
+        self.sendall("GET /" + path + " HTTP/1.1\r\n")
         self.sendall("Host: "+ host + "\r\n")
         self.sendall("User-Agent: Python-urllib\r\n")
         self.sendall("Accept: */*\r\n")
